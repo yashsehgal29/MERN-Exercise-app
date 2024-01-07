@@ -1,24 +1,45 @@
 import React from 'react'
 import { useEffect,useState } from 'react'
+import WorkoutDetails from './WorkoutDetails'
+import Workoutform from './Workoutform'
+import { useDispatch,useSelector } from 'react-redux'
+import { addWorkout } from '../features/Workout/WorkoutSlice'
 function Home() {
-    const [workouts,setworkouts] =useState(null)
-    useEffect(()=>{
-        const fetchworkouts=async()=>{
-            const response=await fetch('/api/workouts')
-            const Json=await response.json()
-            if(response.ok){
-                setworkouts(Json)
-            }
-        }
-        fetchworkouts()
-    },[])
+    // const [workouts, setWorkouts] = useState(null)
+  const dispatch=useDispatch()
+ 
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+  try {
+    const response = await fetch('/api/workouts');
+    const json = await response.json();
+    console.log('Fetched workouts:', json);
+
+    if (response.ok) {
+      json.forEach((workout) => {
+        dispatch(addWorkout(workout));
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching workouts:', error);
+  }
+};
+
+    fetchWorkouts()
+  }, [])
+   const workouts=useSelector((state)=>state.workout)
+   console.log("Workouts :", workouts)
   return (
-    <div >
-        <div>
+    <div className='flex justify-around pt-10 ' >
+        <div className='w-1/3'>
+            
             {workouts && workouts.map((workout)=>(
-                <p key={workout._id}>{workout.title}</p>
+                <WorkoutDetails key={workout._id} workout={workout}/>
             ))}
-        </div>
+            </div>
+           <div className=" h-fit">
+            <Workoutform/>
+           </div>
       
     </div>
   )
